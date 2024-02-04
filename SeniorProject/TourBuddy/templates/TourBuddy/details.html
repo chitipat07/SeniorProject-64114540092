@@ -1,0 +1,55 @@
+{%extends 'TourBuddy/home.html'%}
+
+{%block content%}
+    <div class="bg-white mt-5 ml-5 mr-5 mb-5 border rounded-xl shadow-sm sm:flex dark:bg-slate-200 dark:border-gray-700 dark:shadow-slate-700/[.7]">
+        <div class="flex-shrink-0 relative w-full rounded-t-xl overflow-hidden pt-[40%] sm:rounded-s-xl sm:max-w-[15rem] md:rounded-se-none md:max-w-xs">
+          <img class="w-full h-full absolute top-0 start-0 object-cover" src="{{data.image}}" alt="Image Description">
+        </div>
+        <div class="flex flex-wrap">
+          <div class="p-4 flex flex-col h-full sm:p-7">
+            <h1 class="text-4xl font-bold text-gray-100 dark:text-black">
+              {{data.name}}
+            </h1>
+            <p class="mt-5 text-xl text-gray-500 dark:text-gray-400">
+                ประเภท: {{data.type}}
+              </p>
+            <p class="mt-5 text-xl text-gray-500 dark:text-gray-400">
+              {{data.rating}}⭐คะแนนรีวิว{{data.review}}
+            </p>
+
+                {{data.latitude}}  {{data.longitude}}
+
+            <a href="http://maps.google.com/maps?q={{data.latitude}},{{data.longitude}}">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" data-slot="icon" class="w-12 h-12">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z" />
+                  </svg>
+                  
+              </a>
+            
+          </div>
+        </div>
+      </div>
+{%endblock%}
+      
+
+
+    <!-- <div class="container mx-auto px-4 py-8">
+        <h1 class="text-4xl font-bold mb-4">{{data.name}}</h1>
+        <div class="max-w-md mx-auto bg-white rounded-lg overflow-hidden shadow-lg">
+            <img class="w-full" src="{{data.image.url}}" alt="Place Image">
+            <div class="px-6 py-4">
+                <div class="flex justify-between mb-4">
+                    <div class="text-gray-600">Rating: <span class="font-bold">4.5</span></div>
+                    <div class="text-gray-600">Reviews: <span class="font-bold">25</span></div>
+                </div>
+                <p class="text-gray-700 text-base mb-2">
+                    Type: <span class="font-bold">Beach</span>
+                </p>
+            </div>
+        </div>
+    </div> -->
+
+
+</body>
+</html>

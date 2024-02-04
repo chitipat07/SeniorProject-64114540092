@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>เข้าสู่ระบบ - เว็บไซต์ท่องเที่ยว</title>
+  <!-- CSS -->
+  <style>
+    /* CSS สำหรับเนื้อหาต่างๆ ของเว็บไซต์ */
+    /* ตัวอย่างการสร้างเลเอาท์และสไตล์ของเว็บไซต์ */
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background-image: url('https://static.thairath.co.th/media/dFQROr7oWzulq5FZUIVNrgcAuSEVpmdZwKSC23KlKAEMNBbMBJ7GEvpfzId6osBXpwm.jpg');
+      background-size: cover;
+    }
+    .container {
+      max-width: 400px;
+      padding: 20px;
+      background-color: rgba(255, 255, 255, 0.8); /* ทำให้พื้นหลังของฟอร์มโปร่งใส */
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.3); /* เพิ่มเงาให้กับฟอร์ม */
+    }
+    form {
+      padding: 20px;
+    }
+    label,
+    input[type="text"],
+    input[type="password"] {
+      display: block;
+      margin-bottom: 10px;
+    }
+    input[type="text"],
+    input[type="password"] {
+      width: calc(100% - 22px); /* ตัดขอบของช่อง input ให้เป็นไปตามข้อความ */
+      padding: 10px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+    }
+    input[type="submit"] {
+      width: 100%;
+      padding: 10px;
+      border-radius: 5px;
+      border: none;
+      background-color: #4CAF50;
+      color: white;
+      cursor: pointer;
+    }
+    button {
+            padding: 10px 20px; /* Adjust padding as needed */
+            border: none;
+            border-radius: 5px;
+            background-color: #4CAF50; /* Background color */
+            color: white; /* Text color */
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 4px 2px;
+            cursor: pointer;
+            transition-duration: 0.4s;
+        }
+
+        button:hover {
+            background-color: #45a049; /* Darker background color on hover */
+            color: white; /* Text color on hover */
+        }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1 style="text-align: center;">เข้าสู่ระบบ</h1>
+    <form action="" method="post">
+        {%csrf_token%}
+        {{form.as_p}}
+        <button type="submit">เข้าสู่ระบบ</button>
+    </form>
+    
+  </div>
+</body>
+</html>

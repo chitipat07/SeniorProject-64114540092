@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="//unpkg.com/alpinejs" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/alpinejs@2"></script>
+    
+
+    <title>TourBuddy</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+
+        header {
+            background-color: #333;
+            color: #fff;
+            padding: 20px;
+            text-align: center;
+        }
+
+        main {
+            padding: 20px;
+        }
+
+        section {
+            margin-bottom: 30px;
+        }
+
+        h2 {
+            color: #333;
+        }
+
+        .slider {
+            max-width: 800px;
+            margin: auto;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .slides {
+            display: flex;
+            transition: transform 0.5s ease-in-out;
+        }
+
+        .slide {
+            min-width: 100%;
+            box-sizing: border-box;
+        }
+
+        .slide img {
+            width: 100%;
+            height: auto;
+        }
+
+        .slider-controls {
+            position: absolute;
+            top: 50%;
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            transform: translateY(-50%);
+        }
+
+        .slider-control {
+            cursor: pointer;
+            background: rgba(0, 0, 0, 0.5);
+            color: #fff;
+            border: none;
+            padding: 10px;
+            font-size: 18px;
+        }
+
+        .destination {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-around;
+        }
+
+        .destination-item {
+            margin: 10px;
+            max-width: 300px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s;
+        }
+
+        .destination-item:hover {
+            transform: scale(1.05);
+        }
+
+        .destination-item img {
+            width: 100%;
+            height: auto;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .destination-item-content {
+            padding: 15px;
+        }
+
+        footer {
+            background-color: #333;
+            color: #fff;
+            text-align: center;
+            padding: 10px;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+        }
+
+        .top-right-buttons {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            gap: 10px;
+        }
+
+        .top-right-buttons button {
+            padding: 8px 12px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .signup-button {
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        .login-button {
+            background-color: #333;
+            color: white;
+        }
+
+        .logout-button {
+            background-color: #db1313;
+            color: white;
+        }
+
+        .video-container {
+            position: relative;
+            width: 75%;
+            height: 75%;
+            padding-bottom: 56.25%;
+            margin: 0 auto;
+            /* 16:9 aspect ratio (9 divided by 16 = 0.5625 or 56.25%) */
+        }
+
+        .video-container iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 75%;
+            height: 50%;
+        }
+    </style>
+</head>
+
+<body>
+
+    <nav class="bg-gray-800 p-4">
+        <div class="container mx-auto flex justify-between items-center">
+            <div class="text-white text-2xl font-semibold">TourBuddy</div>
+
+            {% if user.is_authenticated %}
+
+            <form action="{% url 'home' %}" method="get" class="flex items-center">
+                {% csrf_token %}
+                <div class="flex items-center">
+                    <select name="trip_type" class="bg-gray-700 text-white rounded-full py-2 px-4 focus:outline-none focus:bg-gray-600">
+                        <option value="">All</option>
+                        {% for t in types %}
+                            <option value="{{ t.trip_type }}">{{ t.trip_type }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <button type="submit" class="ml-2 bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded-full">
+                    กรอง
+                </button>
+            </form>
+
+            {% for trip in trips %}
+            <div
+                class="max-w-sm rounded overflow-hidden shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-transform duration-300">
+                <img class="w-full" style="height: 250px; object-fit: cover;" src="{{trip.image}}"
+                    alt="Sunset in the mountains">
+                <div class="px-6 py-4">
+                    <div class="font-bold text-xl mb-2">{{trip.name}}</div>
+                    <p class="text-gray-700 text-base">
+                        {{trip.rating}} ⭐
+                    </p>
+                    <p class="text-gray-700 text-base">
+                        {{trip.trip_type}}
+                    </p>
+                    <a href="{% url 'details' trip.id %}">อ่านต่อ</a>
+                </div>
+            </div>
+
+            {% endfor %}
+
+            <!-- {% if query1 %}
+            <div class="grid grid-cols-4 gap-4 justify-between mt-20 ml-20 mr-20">
+                {% for i in results1 %}
+                <div
+                    class="max-w-sm rounded overflow-hidden shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-transform duration-300">
+                    <img class="w-full" style="height: 250px; object-fit: cover;" src="{{ i.image }}"
+                        alt="Sunset in the mountains">
+                    <div class="px-6 py-4">
+                        <div class="font-bold text-xl mb-2">{{ i.name }}</div>
+                        <p class="text-gray-700 text-base">
+                            {{ i.rating }} ⭐
+                        </p>
+                        <p class="text-gray-700 text-base">
+                            {{ i.trip_type }}
+                        </p>
+                        <a href="{% url 'details' i.id %}">อ่านต่อ</a>
+                    </div>
+                </div>
+                {% empty %}
+                <div>
+                    ไม่พบ
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %} -->
+
+            <form action="{%url 'search'%}" method="get">
+                {%csrf_token%}
+                <div class="relative">
+                    <input type="text" name="query" placeholder="ค้นหา"
+                        class="bg-gray-700 text-white rounded-full py-2 px-4 pl-10 focus:outline-none focus:bg-gray-600">
+                    <div class="absolute top-0 left-3 flex items-center h-full">
+                        <svg class="w-5 h-5 text-gray-400" fill="none" stroke-linecap="round" stroke-linejoin="round"
+                            stroke-width="2" viewBox="0 0 24 24" stroke="currentColor">
+                            <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                        </svg>
+                    </div>
+                </div>
+            </form>
+
+
+            <div class="flex items-center space-x-4">
+                <div class="text-white">{{ user.first_name }} {{ user.last_name }}</div>
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" data-slot="icon"
+                    class="w-6 h-6">
+                    <path fill-rule="evenodd" fill="white"
+                        d="M18.685 19.097A9.723 9.723 0 0 0 21.75 12c0-5.385-4.365-9.75-9.75-9.75S2.25 6.615 2.25 12a9.723 9.723 0 0 0 3.065 7.097A9.716 9.716 0 0 0 12 21.75a9.716 9.716 0 0 0 6.685-2.653Zm-12.54-1.285A7.486 7.486 0 0 1 12 15a7.486 7.486 0 0 1 5.855 2.812A8.224 8.224 0 0 1 12 20.25a8.224 8.224 0 0 1-5.855-2.438ZM15.75 9a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0Z"
+                        clip-rule="evenodd" />
+                </svg>
+
+
+                <a href="{% url 'logout' %}">
+                    <button class="bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-4 rounded">
+                        ออกจากระบบ
+                    </button>
+                </a>
+            </div>
+            {% else %}
+            <div class="flex items-center space-x-4">
+                <a href="{% url 'register' %}">
+                    <button class="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded">
+                        สมัครสมาชิก
+                    </button>
+                </a>
+                <a href="{% url 'login' %}">
+                    <button class="bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-4 rounded">
+                        เข้าสู่ระบบ
+                    </button>
+                </a>
+            </div>
+            {% endif %}
+        </div>
+    </nav>
+
+    {%block content%}
+    <main>
+
+        <div class="slider">
+            <div class="slides">
+                <div class="slide">
+                    <img src="https://my.kapook.com/imagescontent/fb_img/340/s_174815_3195.jpg" alt="Slide 1">
+                </div>
+                <div class="slide">
+                    <img src="https://img.wongnai.com/p/1920x0/2023/05/11/494f941906324af29e745e4a6396b824.jpg"
+                        alt="Slide 2">
+                </div>
+                <div class="slide">
+                    <img src="https://reviewnortheast.com/ubonratchathani/pic/coversocial.jpg" alt="Slide 3">
+                </div>
+                <!-- เพิ่มภาพสไลด์เพิ่มเติมตามต้องการ -->
+            </div>
+            <div class="slider-controls">
+                <button class="slider-control" onclick="prevSlide()">❮</button>
+                <button class="slider-control" onclick="nextSlide()">❯</button>
+            </div>
+        </div>
+        <a href="{%url 'data_map'%}">
+            <button type="button" class="text-white bg-gradient-to-r from-green-400 via-green-500 to-green-600 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-green-300 dark:focus:ring-green-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2">Green</button>
+        </a>
+
+        {% if query %}
+        <div class="grid grid-cols-4 gap-4 justify-between mt-20 ml-20 mr-20">
+            {%for i in results%}
+            <div
+                class="max-w-sm rounded overflow-hidden shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-transform duration-300">
+                <img class="w-full" style="height: 250px; object-fit: cover;" src="{{i.image}}"
+                    alt="Sunset in the mountains">
+                <div class="px-6 py-4">
+                    <div class="font-bold text-xl mb-2">{{i.name}}</div>
+                    <p class="text-gray-700 text-base">
+                        {{i.rating}} ⭐
+                    </p>
+                    <p class="text-gray-700 text-base">
+                        {{i.trip_type}}
+                    </p>
+                    <a href="{%url 'details' i.id %}">อ่านต่อ</a>
+                </div>
+
+            </div>
+            {%empty%}
+            <div>
+                ไม่พบ
+            </div>
+            {%endfor%}
+        </div>
+
+
+        {% else %}
+
+        <div class="grid grid-cols-4 gap-4 justify-between mt-20 ml-20 mr-20">
+            {%for i in data_page%}
+            <div
+                class="max-w-sm rounded overflow-hidden shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-transform duration-300 ">
+                <img class="w-full" style="height: 250px; object-fit: cover;" src="{{i.image}}"
+                    alt="Sunset in the mountains">
+                <div class="px-6 py-4">
+                    <div class="font-bold text-xl mb-2">{{i.name}}</div>
+                    <p class="text-gray-700 text-base">
+                        {{i.rating}} ⭐
+                    </p>
+                    <p class="text-gray-700 text-base">
+                        {{i.trip_type}}
+                    </p>
+                    <a href="{%url 'details' i.id %}">อ่านต่อ</a>
+                </div>
+                <div class="px-6 pt-4 pb-2">
+                    <span
+                        class="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">#photography</span>
+                    <span
+                        class="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">#travel</span>
+                    <span
+                        class="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">#winter</span>
+                </div>
+            </div>
+            {%endfor%}
+        </div>
+
+        {%endif%}
+
+
+        <!-- <div class="flex justify-center mt-20">
+            <div x-data="pagination()" x-init="init()">
+                <template x-for="page in pages" :key="page">
+                    <a :href="'?page=' + page" x-text="page"
+                        :class="{ 'bg-blue-500 text-white': page == current, 'hover:bg-blue-400': page != current }"
+                        class="py-2 px-4 mx-1 rounded"></a>
+                </template>
+            </div>
+        </div>
+
+
+        <div class="grid grid-cols-4 justify-between gap-4 mt-20 ml-20 mr-20">
+            <template x-for="i in data_page">
+
+            </template>
+
+            
+        </div>
+
+
+        <script>
+            function pagination() {
+                return {
+                    current: 1,
+                    pages: [],
+                    init() {
+
+                        const totalPages = parseInt('{{ data_page.paginator.num_pages }}');
+
+
+                        this.pages = Array.from({ length: totalPages }, (_, index) => index + 1);
+
+
+                        this.current = parseInt('{{ data_page.number }}');
+                    },
+                };
+            }
+        </script> -->
+        <div class="flex justify-center mt-20">
+            <div x-data="pagination()" x-init="init()">
+                <template x-for="page in pages" :key="page">
+                    <a :href="'?page=' + page" x-text="page"
+                        :class="{ 'bg-blue-500 text-white': page == current, 'hover:bg-blue-400': page != current }"
+                        class="py-2 px-4 mx-1 rounded"></a>
+                </template>
+            </div>
+        </div>
+
+
+        <script>
+            function pagination() {
+                return {
+                    current: 1,
+                    pages: [],
+                    init() {
+                        const totalPages = parseInt('{{ data_page.paginator.num_pages }}');
+                        this.pages = Array.from({ length: totalPages }, (_, index) => index + 1);
+                        this.current = parseInt('{{ data_page.number }}');
+                    },
+                };
+            }
+        </script>
+
+
+
+        <div class="video-container justify-between mt-20 ml-20 mr-20">
+            <iframe src="https://www.youtube.com/embed/Ll17TDkZlys" frameborder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowfullscreen></iframe>
+        </div>
+
+    </main>
+    {%endblock%}
+
+    <script>
+        let currentSlide = 0;
+
+        function showSlide(index) {
+            const slides = document.querySelector('.slides');
+            const totalSlides = document.querySelectorAll('.slide').length;
+
+            if (index >= totalSlides) {
+                currentSlide = 0;
+            } else if (index < 0) {
+                currentSlide = totalSlides - 1;
+            } else {
+                currentSlide = index;
+            }
+
+            const translateValue = -currentSlide * 100 + '%';
+            slides.style.transform = 'translateX(' + translateValue + ')';
+        }
+
+        function prevSlide() {
+            showSlide(currentSlide - 1);
+        }
+
+        function nextSlide() {
+            showSlide(currentSlide + 1);
+        }
+
+        setInterval(nextSlide, 5000); // อัตโนมัติเปลี่ยนภาพทุก 5 วินาที
+
+
+    </script>
+
+
+
+
+
+
+</body>
+
+</html>
