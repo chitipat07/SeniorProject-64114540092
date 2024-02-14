@@ -9,6 +9,12 @@ urlpatterns = [
     path('search/',search_data,name='search'),
     path('details/<int:trip_id>/',details, name='details'),
     path('data_map/',data_map, name='data_map'),
+    path('data_filter/',data_filter, name='data_filter'),
+    path('get-nearest-place/',distances, name='distances'),
+    path('show_tsp_graph/', show_tsp_graph, name='show_tsp_graph'),
+    path('create_TouristNode/<int:id>/', create_TouristNode, name='create_TouristNode'),
+    path("delete_item/<int:id>/",Delete_item,name='delete_item'),
 
-    
+
+
 ]

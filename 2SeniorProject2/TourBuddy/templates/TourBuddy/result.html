@@ -1,0 +1,70 @@
+{% extends 'TourBuddy/home.html' %}
+
+{% block content %}
+
+<div id="map" style="height: 100vh; width: 100vw;"></div>
+
+{{ places|json_script:"places_json" }}
+
+<script>
+    var map = L.map('map').setView([15.2302166, 104.8572949], 13);
+    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+    }).addTo(map);
+
+    function resizeMap() {
+        var mapElement = document.getElementById('map');
+        mapElement.style.height = window.innerHeight + 'px';
+        mapElement.style.width = window.innerWidth + 'px';
+        map.invalidateSize();
+    }
+
+    window.addEventListener('resize', resizeMap);
+    resizeMap();
+
+    let places = JSON.parse(document.getElementById('places_json').textContent);
+
+    places.forEach(place => {
+        L.marker([place.latitude, place.longitude]).addTo(map);
+    })
+
+    map.on('click', (event) => {
+        let lat = event.latlng.lat;
+        let longitude = event.latlng.lng;
+        L.marker([lat, longitude]).addTo(map);
+
+        fetch(`/get-nearest-place?latitude=${lat}&longitude=${longitude}`)
+            .then(response => response.json())
+            .then(result => {
+                let places_coordinates = result.coordinates;
+                let user_coordinates = [lat, longitude];
+                let polyline = L.polyline([user_coordinates, places_coordinates]).addTo(map);
+
+                // สร้าง Popup
+                let popupContent = `<p>สถานที่ใกล้ๆ ${result.distance} km</p>`;
+                let popup = L.popup()
+                    .setLatLng([lat, longitude])
+                    .setContent(popupContent)
+                    .openOn(map);
+            });
+    });
+
+    fetch('/show_tsp_graph/')
+        .then(response => response.json())
+        .then(data => {
+            var tspRoute = data.tsp_route;
+
+            tspRoute = tspRoute.map(coord => [coord[0], coord[1]]);
+
+            var tspPolyline = L.polyline(tspRoute, { color: 'red' }).addTo(map);
+        })
+        .catch(error => console.error('Error fetching TSP route:', error));
+
+
+</script>
+
+{% endblock %}
+
+
+<!-- {{map|safe}} -->

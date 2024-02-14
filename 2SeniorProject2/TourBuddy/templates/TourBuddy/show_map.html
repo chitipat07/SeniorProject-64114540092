@@ -1,0 +1,28 @@
+{% extends 'TourBuddy/home.html' %}
+
+{% block content %}
+<div id="map" style="height: 600px;"></div>
+
+<script>
+    var map = L.map('map').setView([15.2302166, 104.8572949], 13);
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    }).addTo(map);
+
+    // fetch('/show_tsp_graph/')
+    //     .then(response => response.json())
+    //     .then(data => {
+    //         var tspRoute = data.tsp_route;
+
+    //         tspRoute = tspRoute.map(coord => [coord[0], coord[1]]);
+
+    //         var tspPolyline = L.polyline(tspRoute, { color: 'red' }).addTo(map);
+    //     })
+    //     .catch(error => console.error('Error fetching TSP route:', error));
+
+
+
+</script>
+
+{% endblock %}
