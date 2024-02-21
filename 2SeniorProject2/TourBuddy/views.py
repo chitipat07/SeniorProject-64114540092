@@ -75,12 +75,8 @@ def data_filter(request):
     return render(request, 'TourBUddy/data_filter.html', context)
 
 
-@login_required(login_url='login')
-def data_map(req):
-    places = list(Trip.objects.values('latitude','longitude'))
 
-    context = {'places':places}
-    return render(req, 'TourBuddy/result.html', context)
+
 
 
 @login_required(login_url='login')
@@ -155,6 +151,7 @@ def distances(req):
         'distance': min_distance
     })
 
+###########################################################################################################################
 
 def make_tsp_graph(cities):
     """
@@ -196,7 +193,7 @@ def show_tsp_graph(request):
     tsp_route_coordinates = [(trip.latitude, trip.longitude) for trip in cycle]
 
     return JsonResponse({'tsp_route': tsp_route_coordinates})
-
+###########################################################################################################################
 
 def create_TouristNode(req, id):
     tour = Trip.objects.get(pk=id)
@@ -208,7 +205,51 @@ def create_TouristNode(req, id):
 
     return redirect('/')
 
+
 def Delete_item(req,id):
     data = TouristNode.objects.get(pk=id)
     data.delete()
-    return redirect('read_basket')
+    return redirect('read_TouristNode')
+
+
+def read_TouristNode(request):
+    data = TouristNode.objects.filter(user=request.user)
+    return render(request,'TourBUddy/read_tour.html', {'data': data})
+
+
+def Notti(request):
+    n = TouristNode.objects.filter(user=request.user).count()
+    return JsonResponse({'n': n})
+
+def current_location(req):
+    return render(req,'TourBUddy/current_location.html')
+
+
+def confirm(req):
+    if req.method == 'POST':
+        latitude = req.POST.get('user_latitude')
+        longitude = req.POST.get('user_longitude')
+        
+        basket = TouristNode.objects.filter(user=req.user).first()
+        
+        order = Order_Trip.objects.create(
+            user=req.user,
+            item_trip=basket,
+            user_latitude=latitude,
+            user_longitude=longitude
+        )
+
+        
+        return redirect('data_map')
+
+# places = list(Trip.objects.values('latitude','longitude'))
+
+@login_required(login_url='login')
+def data_map(req):
+    places = list(TouristNode.objects.filter(user=req.user).values('trip__latitude', 'trip__longitude'))
+
+    user_locations = list(Order_Trip.objects.filter(user=req.user).values('user_latitude', 'user_longitude'))
+
+    context = {'places':places,'user_locations': user_locations}
+    return render(req, 'TourBuddy/result.html', context)
+

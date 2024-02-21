@@ -5,6 +5,7 @@
 <div id="map" style="height: 100vh; width: 100vw;"></div>
 
 {{ places|json_script:"places_json" }}
+{{ user_locations|json_script:"user_locations_json" }}
 
 <script>
     var map = L.map('map').setView([15.2302166, 104.8572949], 13);
@@ -24,10 +25,26 @@
     resizeMap();
 
     let places = JSON.parse(document.getElementById('places_json').textContent);
+    let userLocations = JSON.parse(document.getElementById('user_locations_json').textContent);
 
     places.forEach(place => {
-        L.marker([place.latitude, place.longitude]).addTo(map);
+        L.marker([place.trip__latitude, place.trip__longitude]).addTo(map);
     })
+
+    var greenIcon = L.icon({
+        iconUrl: 'https://leafletjs.com/examples/custom-icons/leaf-green.png',
+        shadowUrl: 'https://leafletjs.com/examples/custom-icons/leaf-shadow.png',
+        iconSize: [38, 95], // size of the icon
+        shadowSize: [50, 64], // size of the shadow
+        iconAnchor: [22, 94], // point of the icon which will correspond to marker's location
+        shadowAnchor: [4, 62],  // the same for the shadow
+        popupAnchor: [-3, -76] // point from which the popup should open relative to the iconAnchor
+    });
+
+    userLocations.forEach(location => {
+        L.marker([location.user_latitude, location.user_longitude], { icon: greenIcon }).addTo(map);
+    });
+
 
     map.on('click', (event) => {
         let lat = event.latlng.lat;
@@ -50,21 +67,18 @@
             });
     });
 
-    fetch('/show_tsp_graph/')
-        .then(response => response.json())
-        .then(data => {
-            var tspRoute = data.tsp_route;
+    // fetch('/show_tsp_graph/')
+    //     .then(response => response.json())
+    //     .then(data => {
+    //         var tspRoute = data.tsp_route;
 
-            tspRoute = tspRoute.map(coord => [coord[0], coord[1]]);
+    //         tspRoute = tspRoute.map(coord => [coord[0], coord[1]]);
 
-            var tspPolyline = L.polyline(tspRoute, { color: 'red' }).addTo(map);
-        })
-        .catch(error => console.error('Error fetching TSP route:', error));
+    //         var tspPolyline = L.polyline(tspRoute, { color: 'red' }).addTo(map);
+    //     })
+    //     .catch(error => console.error('Error fetching TSP route:', error));
 
 
 </script>
 
 {% endblock %}
-
-
-<!-- {{map|safe}} -->

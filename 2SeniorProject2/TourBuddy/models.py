@@ -49,8 +49,8 @@ class TouristNode(models.Model):
 class Order_Trip(models.Model):
     user = models.ForeignKey(User,on_delete=models.CASCADE,null=True,blank=True)
     item_trip = models.ForeignKey(TouristNode,on_delete=models.CASCADE,null=True,blank=True)
-    user_latitude = models.FloatField(null=True)  
-    user_longitude = models.FloatField(null=True)
+    user_latitude = models.CharField(max_length=300,null=True)  
+    user_longitude = models.CharField(max_length=300,null=True)
 
     def __str__(self):
         return f' user_latitude {self.user_latitude} user_longitude {self.user_longitude}'

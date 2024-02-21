@@ -1,15 +1,15 @@
 from django.contrib import admin
 from .models import *
 # Register your models here.
-class TripAdmin(admin.ModelAdmin):
-    list_display = ('name', 'location', 'latitude', 'longitude', 'rating', 'trip_type', 'g_type')
+class Order_TripAdmin(admin.ModelAdmin):
+    list_display = ('user', 'item_trip', 'user_latitude', 'user_longitude')
 
 class TouristNodeAdmin(admin.ModelAdmin):
     list_display = ('user', 'trip')
+    
+class TripAdmin(admin.ModelAdmin):
+    list_display = ('location', 'latitude', 'longitude', 'name', 'rating', 'review', 'trip_type', 'g_type', 'image')
 
-class OrderTripAdmin(admin.ModelAdmin):
-    list_display = ('user', 'item_trip', 'user_latitude', 'user_longitude')
-
-admin.site.register(Trip)
-admin.site.register(TouristNode)
-admin.site.register(Order_Trip)
+admin.site.register(Trip, TripAdmin)
+admin.site.register(TouristNode,TouristNodeAdmin)
+admin.site.register(Order_Trip, Order_TripAdmin)

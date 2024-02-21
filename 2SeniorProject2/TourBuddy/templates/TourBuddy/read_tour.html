@@ -1,0 +1,40 @@
+{% extends 'TourBuddy/home.html' %}
+{% block content %}
+
+<div class="flex flex-col md:flex-row md:justify-between md:items-center">
+    <h1 class="text-2xl font-bold my-4 text-gray-600">รายการสถานที่ ที่เลือก</h1>
+    <a href="{% url 'home' %}"><button class="bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded">
+            เพิ่มสถานที่
+        </button></a>
+</div>
+
+<div class="grid grid-cols-4 gap-4 justify-between mt-10 ml-20 mr-20 mb-10">
+    {%for s in data%}
+    <div
+        class="mb-10 max-w-sm rounded overflow-hidden shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-transform duration-300 bg-white">
+        <a href="{%url 'details' s.id %}"><img class="w-full" style="height: 250px; object-fit: cover;"
+                src="{{s.trip.image}}" alt="Sunset in the mountains"></a>
+        <div class="px-6 py-4">
+            <div class="font-bold text-xl mb-2">{{s.trip.name}}</div>
+            <p class="text-gray-700 text-base">
+                {{s.trip.rating}} ⭐
+            </p>
+            <p class="text-gray-700 text-base">
+                {{s.trip.g_type}}
+            </p>
+            <a href="{%url 'details' s.id %}">อ่านต่อ</a>
+        </div>
+        <a href="/delete_item/{{s.id}}" class="text-black block text-end mb-2 mr-2">
+            <i class="fa-solid fa-trash-can text-red-700 text-2xl"></i>
+        </a>
+    </div>
+
+
+    {%endfor%}
+    
+    <div class="col-span-4 mb-10">
+        {% include 'TourBuddy/current_location.html' %}
+    </div>
+    
+    {% endblock %}
+

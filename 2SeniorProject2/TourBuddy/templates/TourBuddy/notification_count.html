@@ -1,0 +1,16 @@
+<script>
+    function fetchData() {
+        fetch('/n/')
+            .then(response => response.json())
+            .then(data => {
+                const dataList = document.getElementById('data-list');
+                dataList.innerHTML = '';
+                const li = document.createElement('p');
+                li.textContent = data.n;
+                dataList.appendChild(li);
+            });
+    }
+
+    setInterval(fetchData, 500); // อัพเดทข้อมูลทุก 5 วินาที
+    fetchData(); // ดึงข้อมูลเมื่อหน้าเว็บโหลด
+</script>

@@ -14,6 +14,14 @@ urlpatterns = [
     path('show_tsp_graph/', show_tsp_graph, name='show_tsp_graph'),
     path('create_TouristNode/<int:id>/', create_TouristNode, name='create_TouristNode'),
     path("delete_item/<int:id>/",Delete_item,name='delete_item'),
+    path("read_TouristNode/",read_TouristNode,name='read_TouristNode'),
+    path("current_location/",current_location,name='current_location'),
+    path('n/', Notti, name='n'),
+    path("confirm/",confirm,name='confirm'),
+
+
+
+
 
 
 
