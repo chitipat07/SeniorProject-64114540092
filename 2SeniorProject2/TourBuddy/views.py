@@ -151,20 +151,43 @@ def distances(req):
         'distance': min_distance
     })
 
-###########################################################################################################################
 
-def make_tsp_graph(cities):
+def distrip(req):
+    user_latitude = float(Order_Trip.objects.filter(user=req.user).values('user_latitude')[0]['user_latitude'])
+    user_longitude = float(Order_Trip.objects.filter(user=req.user).values('user_longitude')[0]['user_longitude'])
+    user_location = (user_latitude,user_longitude)
+    all_distances = {}
+    
+    for place in TouristNode.objects.filter(user=req.user):
+        place_location = (float(place.trip.latitude), float(place.trip.longitude))
+        distance = geodesic(user_location, place_location).km
+        all_distances[place] = distance
+    
+    return all_distances
+
+def make_tsp_graph(user_location, cities):
     """
-    Create a complete graph representing all possible paths between cities.
+    Create a complete graph representing all possible paths between user location and cities.
     """
     G = nx.Graph()
 
-    for trip in cities:
-        G.add_node(trip)
+    # Add user location as a node
+    G.add_node("User", pos=user_location)
 
-    for trip1, trip2 in permutations(cities, 2):
-        distance = trip1.distance_to(trip2) 
-        G.add_edge(trip1, trip2, weight=distance)
+    # Add tourist nodes as nodes
+    for place in cities:
+        G.add_node(place, pos=(cities[place].latitude, cities[place].longitude))
+
+    # Calculate distances and add edges between user location and tourist nodes
+    for place in cities:
+        distance = geodesic(user_location, (cities[place].latitude, cities[place].longitude)).km
+        G.add_edge("User", place, weight=distance)
+
+    # Calculate distances and add edges between tourist nodes
+    for place1, place2 in permutations(cities, 2):
+        distance = geodesic((cities[place1].latitude, cities[place1].longitude),
+                            (cities[place2].latitude, cities[place2].longitude)).km
+        G.add_edge(place1, place2, weight=distance)
 
     return G
 
@@ -182,17 +205,70 @@ def tsp_christofides(graph):
 
 
 def show_tsp_graph(request):
-    all_trips = Trip.objects.all()
+    user_order_trip = Order_Trip.objects.filter(user=request.user).first()
+    if user_order_trip:
+        user_latitude = float(user_order_trip.user_latitude)
+        user_longitude = float(user_order_trip.user_longitude)
+        user_location = (user_latitude, user_longitude)
 
-    cities = [trip for trip in all_trips]
+        all_trips = TouristNode.objects.filter(user=request.user)
 
-    tsp_graph = make_tsp_graph(cities)
+        cities = {}
+        for trip in all_trips:
+            cities[trip.trip.name] = trip.trip
 
-    cycle = nx.approximation.traveling_salesman.christofides(tsp_graph, weight="weight")
+        tsp_graph = make_tsp_graph(user_location, cities)
+
+        cycle = nx.approximation.traveling_salesman.christofides(tsp_graph, weight="weight")
+        
+        tsp_route_coordinates = [(tsp_graph.nodes[node]["pos"]) for node in cycle]
+
+        return JsonResponse({'tsp_route': tsp_route_coordinates})
+    else:
+        return JsonResponse({'error': 'No user location found'})
+
+###########################################################################################################################
+
+# def make_tsp_graph(cities):
+#     """
+#     Create a complete graph representing all possible paths between cities.
+#     """
+#     G = nx.Graph()
+
+#     for trip in cities:
+#         G.add_node(trip)
+
+#     for trip1, trip2 in permutations(cities, 2):
+#         distance = trip1.distance_to(trip2) 
+#         G.add_edge(trip1, trip2, weight=distance)
+
+#     return G
+
+
+# def tsp_christofides(graph):
+#     """
+#     Find an approximate solution to the Traveling Salesman Problem using the Christofides Algorithm.
+#     """
+#     cycle = nx.approximation.traveling_salesman.christofides(graph, weight="weight")
+#     edge_list = list(nx.utils.pairwise(cycle))
+
+#     tsp_route = edge_list + [edge_list[0]]
+
+#     return tsp_route
+
+
+# def show_tsp_graph(request):
+#     all_trips = Trip.objects.all()
+
+#     cities = [trip for trip in all_trips]
+
+#     tsp_graph = make_tsp_graph(cities)
+
+#     cycle = nx.approximation.traveling_salesman.christofides(tsp_graph, weight="weight")
     
-    tsp_route_coordinates = [(trip.latitude, trip.longitude) for trip in cycle]
+#     tsp_route_coordinates = [(trip.latitude, trip.longitude) for trip in cycle]
 
-    return JsonResponse({'tsp_route': tsp_route_coordinates})
+#     return JsonResponse({'tsp_route': tsp_route_coordinates})
 ###########################################################################################################################
 
 def create_TouristNode(req, id):
@@ -253,3 +329,23 @@ def data_map(req):
     context = {'places':places,'user_locations': user_locations}
     return render(req, 'TourBuddy/result.html', context)
 
+
+# def distance_to(self, other_trip):
+#         """
+#         Calculate the distance between two trips using their latitude and longitude.
+#         """
+#         lat1 = radians(self.latitude)
+#         lon1 = radians(self.longitude)
+#         lat2 = radians(other_trip.latitude)
+#         lon2 = radians(other_trip.longitude)
+
+#         R = 6371.0
+
+#         dlat = lat2 - lat1
+#         dlon = lon2 - lon1
+
+#         a = sin(dlat / 2)**2 + cos(lat1) * cos(lat2) * sin(dlon / 2)**2
+#         c = 2 * atan2(sqrt(a), sqrt(1 - a))
+#         distance = R * c
+
+#         return distance

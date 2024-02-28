@@ -17,28 +17,6 @@ class Trip(models.Model):
     def __str__(self):
         return f' name {self.name} latitude {self.latitude} longitude {self.longitude}'
     
-    def distance_to(self, other_trip):
-        """
-        Calculate the distance between two trips using their latitude and longitude.
-        """
-        lat1 = radians(self.latitude)
-        lon1 = radians(self.longitude)
-        lat2 = radians(other_trip.latitude)
-        lon2 = radians(other_trip.longitude)
-
-        R = 6371.0
-
-        dlat = lat2 - lat1
-        dlon = lon2 - lon1
-
-        a = sin(dlat / 2)**2 + cos(lat1) * cos(lat2) * sin(dlon / 2)**2
-        c = 2 * atan2(sqrt(a), sqrt(1 - a))
-        distance = R * c
-
-        return distance
-
-
-
 
 class TouristNode(models.Model):
     user = models.ForeignKey(User,on_delete=models.CASCADE,null=True,blank=True)

@@ -116,12 +116,12 @@
     <form action="" method="post">
       {% csrf_token %}
       <!-- {{ form|crispy }} -->
-      {%for i in form%}
-      <div>
-        {{i.label}}
-        {{i}}
-      </div>
-      {%endfor%}
+        {%for i in form%}
+        <div>
+          {{i.label}}
+          {{i}}
+        </div>
+        {%endfor%}
 
       <button type="submit">สมัครสมาชิก</button>
 

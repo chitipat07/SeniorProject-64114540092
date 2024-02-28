@@ -23,7 +23,7 @@
     {% include 'TourBuddy/stylecss.html' %}
 </head>
 
-<body class="bg-gray-200">
+<body class="flex flex-col min-h-screen bg-gray-200">
     <nav class="bg-gray-800 p-4">
         <div class="container mx-auto flex justify-between items-center">
             <a href="{%url 'home'%}">
@@ -76,7 +76,7 @@
         </div>
     </nav>
     {%block content%}
-    <main>
+    <main class="flex-grow">
             <div class="slider">
                 <div class="slides">
                     <div class="slide">
@@ -136,37 +136,8 @@
 
 
         {% if query %}
-        <div class="grid grid-cols-4 gap-4 justify-between mt-20 ml-20 mr-20">
-            {%for i in results%}
-            <div
-                class="max-w-sm rounded overflow-hidden shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-transform duration-300 bg-white">
-                <img class="w-full" style="height: 250px; object-fit: cover;" src="{{i.image}}"
-                    alt="Sunset in the mountains">
-                <div class="px-6 py-4">
-                    <div class="font-bold text-xl mb-2">{{i.name}}</div>
-                    <p class="text-gray-700 text-base">
-                        {{i.rating}} ⭐
-                    </p>
-                    <p class="text-gray-700 text-base">
-                        {{i.g_type}}
-                    </p>
-                    <a href="{%url 'details' i.id %}">อ่านต่อ</a>
-                </div>
-                <div class="px-6 pt-4 pb-2">
-                    <span
-                        class="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">#photography</span>
-                    <span
-                        class="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">#travel</span>
-                    <span
-                        class="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">#winter</span>
-                </div>
-            </div>
-            {%empty%}
-            <div>
-                ไม่พบ
-            </div>
-            {%endfor%}
-        </div>
+        {% include 'TourBuddy/for_search.html' %}
+        
 
 
         {% else %}
@@ -275,42 +246,6 @@
                 };
             }
         </script>
-        <!-- <div class="flex justify-center mt-20">
-            <div x-data="pagination()" x-init="init()">
-                <template x-for="page in pages" :key="page">
-                    <template x-if="shouldDisplayPage(page)">
-                        <a :href="'?page=' + page" x-text="page"
-                            :class="{ 'bg-blue-500 text-white': page == current, 'hover:bg-blue-400': page != current }"
-                            class="py-2 px-4 mx-1 rounded"></a>
-                    </template>
-                </template>
-            </div>
-        </div>
-
-        <script>
-            function pagination() {
-                return {
-                    current: 1,
-                    pages: [],
-                    init() {
-                        const totalPages = parseInt('{{ data_page.paginator.num_pages }}');
-                        this.pages = Array.from({ length: totalPages }, (_, index) => index + 1);
-                        this.current = parseInt('{{ data_page.number }}');
-                    },
-                    shouldDisplayPage(page) {
-                        // Check if page is within current page, previous page, next page, first page, or last page
-                        return (
-                            page == this.current ||
-                            page == this.current - 1 ||
-                            page == this.current + 1 ||
-                            page == 1 ||
-                            page == this.pages.length
-                        );
-                    }
-                };
-            }
-        </script> -->
-
 
 
         <div class="video-container justify-between mt-20 ml-20 mr-20">
@@ -320,6 +255,7 @@
         </div>
 
     </main>
+    {% include 'TourBuddy/footer.html' %}
     {%endblock%}
 
     <script>

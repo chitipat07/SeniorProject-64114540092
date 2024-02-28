@@ -1,0 +1,79 @@
+<div class="grid grid-cols-4 gap-4 justify-between mt-20 ml-20 mr-20">
+
+    {% for i in results %}
+    <div
+        class="max-w-sm rounded overflow-hidden shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-transform duration-300 bg-white">
+        <a href="{% url 'details' i.id %}">
+            <img class="w-full" style="height: 250px; object-fit: cover;" src="{{i.image}}"
+                alt="Sunset in the mountains">
+        </a>
+        <div class="px-6 py-4">
+            <div class="font-bold text-xl mb-2">{{i.name}}</div>
+            <p class="text-gray-700 text-base">
+                {{i.rating}} ⭐
+            </p>
+            <p class="text-gray-700 text-base">
+                {{i.g_type}}
+            </p>
+            <a href="{% url 'details' i.id %}">อ่านต่อ</a>
+        </div>
+
+        {% if user.is_authenticated %}
+        <input type="checkbox" id="heart-toggle{{ forloop.counter }}" class="hidden heart-toggle"
+            data-tour-id="{{ i.id }}" {% if user_clicked %}checked{% endif %} />
+        <label class="label" for="heart-toggle{{ forloop.counter }}">
+            {% if user_clicked %}
+            <i class="fa-solid fa-heart" style="color: red;"></i>
+            {% else %}
+            <i class="fa-regular fa-heart"></i>
+            {% endif %}
+        </label>
+        {% endif %}
+    </div>
+    {%empty%}
+            <div>
+                ไม่พบ
+            </div>
+    {% endfor %}
+
+    <script>
+        // หากคลิกที่หัวใจ
+        document.querySelectorAll('.heart-toggle').forEach(function (heartToggle) {
+            heartToggle.addEventListener('change', function () {
+                var tourId = this.getAttribute('data-tour-id');
+                var csrfToken = '{{ csrf_token }}';
+
+                // ส่งคำขอไปยัง URL ที่เซิร์ฟเวอร์ให้บันทึกข้อมูล
+                fetch('/create_TouristNode/' + tourId + '/', {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': csrfToken
+                    }
+                })
+                    .then(response => {
+                        // ตรวจสอบการตอบกลับจากเซิร์ฟเวอร์
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok');
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        // อัปเดตสถานะหัวใจของผู้ใช้
+                        if (data.success) {
+                            this.nextElementSibling.querySelector('i.fa-regular').style.display = 'none';
+                            this.nextElementSibling.querySelector('i.fa-solid').style.display = 'inline';
+                            this.checked = true;
+                        } else {
+                            throw new Error('Failed to update user heart status');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('There was an error!', error);
+                    });
+            });
+        });
+    </script>
+
+
+
+</div>
