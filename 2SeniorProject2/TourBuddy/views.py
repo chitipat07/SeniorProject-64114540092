@@ -150,20 +150,39 @@ def distances(req):
         'coordinates': place_coords,
         'distance': min_distance
     })
+###########################################################################################################################
+# ใช้จริง
+# def distrip(req):
+#     user_latitude = float(Order_Trip.objects.filter(user=req.user).values('user_latitude')[0]['user_latitude'])
+#     user_longitude = float(Order_Trip.objects.filter(user=req.user).values('user_longitude')[0]['user_longitude'])
+#     user_location = (user_latitude,user_longitude)
+#     all_distances = {}
+    
+#     for place in TouristNode.objects.filter(user=req.user):
+#         place_location = (float(place.trip.latitude), float(place.trip.longitude))
+#         distance = geodesic(user_location, place_location).km
+#         all_distances[place] = distance
+    
+#     return all_distances
 
 
 def distrip(req):
-    user_latitude = float(Order_Trip.objects.filter(user=req.user).values('user_latitude')[0]['user_latitude'])
-    user_longitude = float(Order_Trip.objects.filter(user=req.user).values('user_longitude')[0]['user_longitude'])
-    user_location = (user_latitude,user_longitude)
-    all_distances = {}
-    
-    for place in TouristNode.objects.filter(user=req.user):
-        place_location = (float(place.trip.latitude), float(place.trip.longitude))
-        distance = geodesic(user_location, place_location).km
-        all_distances[place] = distance
-    
-    return all_distances
+    user_order_trip = Order_Trip.objects.filter(user=req.user).first()
+    if user_order_trip:
+        user_latitude = float(user_order_trip.user_latitude)
+        user_longitude = float(user_order_trip.user_longitude)
+        user_location = (user_latitude,user_longitude)
+        all_distances = {}
+        
+        for place in TouristNode.objects.filter(user=req.user):
+            place_location = (float(place.trip.latitude), float(place.trip.longitude))
+            distance = geodesic(user_location, place_location).km
+            all_distances[place] = distance
+        
+        return all_distances
+    else:
+        return {}
+
 
 def make_tsp_graph(user_location, cities):
     """
@@ -171,19 +190,15 @@ def make_tsp_graph(user_location, cities):
     """
     G = nx.Graph()
 
-    # Add user location as a node
     G.add_node("User", pos=user_location)
 
-    # Add tourist nodes as nodes
     for place in cities:
         G.add_node(place, pos=(cities[place].latitude, cities[place].longitude))
 
-    # Calculate distances and add edges between user location and tourist nodes
     for place in cities:
         distance = geodesic(user_location, (cities[place].latitude, cities[place].longitude)).km
         G.add_edge("User", place, weight=distance)
 
-    # Calculate distances and add edges between tourist nodes
     for place1, place2 in permutations(cities, 2):
         distance = geodesic((cities[place1].latitude, cities[place1].longitude),
                             (cities[place2].latitude, cities[place2].longitude)).km
