@@ -1,6 +1,33 @@
 {% extends 'TourBuddy/home.html' %}
 
 {% block content %}
+<!-- {% for i in data %}
+<div class="container">
+    <div id="map" class="absolute top-0 left-0 w-full h-full z-10" style="height: 600px;"></div>
+    <div class="relative flex flex-col mt-6 text-gray-700 bg-white shadow-md bg-clip-border rounded-xl w-96 z-20"
+        style="background-color: rgba(255, 255, 255, 0.719);">
+        <div
+            class="relative h-56 mx-4 -mt-6 overflow-hidden text-white shadow-lg bg-clip-border rounded-xl bg-blue-gray-500 shadow-blue-gray-500/40">
+            <img src="{{ i.trip.image }}" alt="card-image" style="width: 100%; height: 100%; object-fit: cover;" />
+        </div>
+        <div class="p-6">
+            <h5
+                class="block mb-2 font-sans text-xl antialiased font-semibold leading-snug tracking-normal text-blue-gray-900">
+                {{ i.trip.name }}
+            </h5>
+            <p class="block font-sans text-base antialiased font-light leading-relaxed text-inherit">
+                ประเภท: {{ i.trip.g_type }}
+            </p>
+            <p class="block font-sans text-base antialiased font-light leading-relaxed text-inherit">
+                {{ i.trip.rating }}⭐คะแนนรีวิว{{ i.trip.review }}
+            </p>
+        </div>
+        <div class="p-6 pt-0">
+
+        </div>
+    </div>
+</div>
+{% endfor %} -->
 
 <div id="map" style="height: 100vh; width: 100vw;"></div>
 
@@ -28,8 +55,9 @@
     let userLocations = JSON.parse(document.getElementById('user_locations_json').textContent);
 
     places.forEach(place => {
-        L.marker([place.trip__latitude, place.trip__longitude]).addTo(map);
-    })
+        L.marker([place.trip__latitude, place.trip__longitude]).addTo(map)
+            .bindPopup(`<b>${place.trip__name}</b><br><img src="${place.trip__image}" width="100">`);
+    });
 
     var greenIcon = L.icon({
         iconUrl: 'https://leafletjs.com/examples/custom-icons/leaf-green.png',
@@ -46,40 +74,82 @@
     });
 
 
-    map.on('click', (event) => {
-        let lat = event.latlng.lat;
-        let longitude = event.latlng.lng;
-        L.marker([lat, longitude]).addTo(map);
 
-        fetch(`/get-nearest-place?latitude=${lat}&longitude=${longitude}`)
-            .then(response => response.json())
-            .then(result => {
-                let places_coordinates = result.coordinates;
-                let user_coordinates = [lat, longitude];
-                let polyline = L.polyline([user_coordinates, places_coordinates]).addTo(map);
 
-                // สร้าง Popup
-                let popupContent = `<p>สถานที่ใกล้ๆ ${result.distance} km</p>`;
-                let popup = L.popup()
-                    .setLatLng([lat, longitude])
-                    .setContent(popupContent)
-                    .openOn(map);
-            });
-    });
 
     fetch('/show_tsp_graph/')
-    .then(response => response.json())
-    .then(data => {
-        var tspRoute = data.tsp_route;
+        .then(response => response.json())
+        .then(data => {
+            var tspRoute = data.tsp_route;
 
-        tspRoute = tspRoute.map(coord => [coord[0], coord[1]]);
+            tspRoute = tspRoute.map(coord => [coord[0], coord[1]]);
 
-        var tspPolyline = L.polyline(tspRoute, { color: 'red' }).addTo(map);
-    })
-    .catch(error => console.error('Error fetching TSP route:', error));
+            var waypoints = tspRoute.map(coord => L.latLng(coord[0], coord[1]));
+
+            var control = L.Routing.control({
+                waypoints: waypoints,
+                routeWhileDragging: true,
+                show: false,
+                createMarker: function (i, waypoint, n) {
+                    if (i === 0) {
+                        return L.marker(waypoint.latLng, { icon: greenIcon });
+                    } else {
+                        return L.marker(waypoint.latLng);
+                    }
+                }
+            }).addTo(map);
+
+            control.on('routesfound', function (e) {
+                var routes = e.routes;
+                var route = routes[0];
+                var coordinates = route.coordinates;
+
+                var marker = L.marker([coordinates[0].lat, coordinates[0].lng], { icon: greenIcon }).addTo(map);
+
+                coordinates.forEach(function (coord, index) {
+                    setTimeout(function () {
+                        marker.setLatLng([coord.lat, coord.lng]);
+                    }, 100 * index);
+                });
+            });
+        })
+        .catch(error => console.error('Error fetching TSP route:', error));
+
+
+    // fetch('/show_tsp_graph/')
+    //     .then(response => response.json())
+    //     .then(data => {
+    //         var tspRoute = data.tsp_route;
+
+    //         tspRoute = tspRoute.map(coord => [coord[0], coord[1]]);
+
+    //         var tspPolyline = L.polyline(tspRoute, { color: 'red' }).addTo(map);
+    //     })
+    //     .catch(error => console.error('Error fetching TSP route:', error));
 
 
 
+
+    // map.on('click', (event) => {
+    //     let lat = event.latlng.lat;
+    //     let longitude = event.latlng.lng;
+    //     L.marker([lat, longitude]).addTo(map);
+
+    //     fetch(`/get-nearest-place?latitude=${lat}&longitude=${longitude}`)
+    //         .then(response => response.json())
+    //         .then(result => {
+    //             let places_coordinates = result.coordinates;
+    //             let user_coordinates = [lat, longitude];
+    //             let polyline = L.polyline([user_coordinates, places_coordinates]).addTo(map);
+
+    //             // สร้าง Popup
+    //             let popupContent = `<p>สถานที่ใกล้ๆ ${result.distance} km</p>`;
+    //             let popup = L.popup()
+    //                 .setLatLng([lat, longitude])
+    //                 .setContent(popupContent)
+    //                 .openOn(map);
+    //         });
+    // });
 </script>
 
 {% endblock %}

@@ -9,6 +9,7 @@ from django.http import JsonResponse
 from geopy.distance import geodesic
 from itertools import permutations
 import networkx as nx
+import folium
 import django_filters
 from .models import *
 from .forms import *
@@ -132,24 +133,24 @@ def search_data(req):
     return render(req,'TourBUddy/home.html',{'query':query,'results':results})
 
 
-def distances(req):
-    latitude = float(req.GET.get('latitude'))
-    longitude = float(req.GET.get('longitude'))
-    user_location = (latitude, longitude)
-    all_distances = {}
+# def distances(req):
+#     latitude = float(req.GET.get('latitude'))
+#     longitude = float(req.GET.get('longitude'))
+#     user_location = (latitude, longitude)
+#     all_distances = {}
 
-    for place in Trip.objects.all():
-        place_location = (place.latitude, place.longitude)
-        distance = geodesic(user_location, place_location).km
-        all_distances[distance] = place_location
+#     for place in Trip.objects.all():
+#         place_location = (place.latitude, place.longitude)
+#         distance = geodesic(user_location, place_location).km
+#         all_distances[distance] = place_location
 
-    min_distance = min(all_distances.keys())
-    place_coords = all_distances[min_distance]
+#     min_distance = min(all_distances.keys())
+#     place_coords = all_distances[min_distance]
 
-    return JsonResponse({
-        'coordinates': place_coords,
-        'distance': min_distance
-    })
+#     return JsonResponse({
+#         'coordinates': place_coords,
+#         'distance': min_distance
+#     })
 ###########################################################################################################################
 # ใช้จริง
 # def distrip(req):
@@ -333,17 +334,34 @@ def confirm(req):
         
         return redirect('data_map')
 
-# places = list(Trip.objects.values('latitude','longitude'))
 
 @login_required(login_url='login')
 def data_map(req):
-    places = list(TouristNode.objects.filter(user=req.user).values('trip__latitude', 'trip__longitude'))
+    places = list(TouristNode.objects.filter(user=req.user).select_related('trip').values('trip__latitude', 'trip__longitude','trip__name','trip__image'))
 
     user_locations = list(Order_Trip.objects.filter(user=req.user).values('user_latitude', 'user_longitude'))
 
-    context = {'places':places,'user_locations': user_locations}
+    data = TouristNode.objects.filter(user=req.user)
+
+    context = {'places':places,'user_locations': user_locations,'data':data}
     return render(req, 'TourBuddy/result.html', context)
 
+
+
+# def data_popup(req):
+#     data = TouristNode.objects.filter(user=req.user)
+
+#     m = folium.Map(location=[15.2302166, 104.8572949],zoom_start=9)
+
+#     for place in data:
+#         coor = (place.trip__latitude,place.trip__longitude)
+#         folium.Marker(coor,popup=place.trip__name).add_to(m)
+
+#     context = {'map':m._repr_html_()}
+#     return render(req,'TourBuddy/show_map.html',context)
+
+
+    
 
 # def distance_to(self, other_trip):
 #         """
