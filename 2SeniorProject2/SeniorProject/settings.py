@@ -27,6 +27,8 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
+CSRF_TRUSTED_ORIGINS = ['https://7f80-202-176-129-233.ngrok-free.app']
+
 
 # Application definition
 
@@ -40,6 +42,7 @@ INSTALLED_APPS = [
     "crispy_forms",
     "crispy_tailwind",
     "TourBuddy",
+    'django_social_share',
 ]
 
 

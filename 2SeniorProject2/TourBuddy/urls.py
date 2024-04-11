@@ -18,6 +18,8 @@ urlpatterns = [
     path("current_location/",current_location,name='current_location'),
     path('n/', Notti, name='n'),
     path("confirm/",confirm,name='confirm'),
+    path("my_view/",my_view,name='my_view'),
+
     # path("data_popup/",data_popup,name='data_popup'),
 
 

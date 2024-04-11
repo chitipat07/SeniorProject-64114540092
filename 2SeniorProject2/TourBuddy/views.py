@@ -347,6 +347,9 @@ def data_map(req):
     return render(req, 'TourBuddy/result.html', context)
 
 
+def my_view(request):
+    custom_url = "https://7f80-202-176-129-233.ngrok-free.app/data_map/"
+    return render(request, 'TourBuddy/result.html', {'custom_url': custom_url})
 
 # def data_popup(req):
 #     data = TouristNode.objects.filter(user=req.user)
