@@ -1,0 +1,77 @@
+{% extends 'tourbuddy/index.html' %}
+
+{% block content %}
+<div class="md:max-w-max mx-auto bg-white rounded-lg overflow-hidden shadow-lg mb-10 mt-10 mr-10 ml-10 sm:max-w-md sm:mr-10 sm:ml-10">
+    <div class="bg-gray-200 px-4 py-2">
+        <h5 class="text-lg font-semibold text-gray-800">Map</h5>
+    </div>
+    <div class="px-4 py-2">
+        <div id="map" class="h-96 sm:h-80 lg:h-screen"></div>
+        <div id="routes-info" class="mt-4 text-center"></div>
+    </div>
+</div>
+
+<script>
+    var map = L.map('map').setView([15.2302166, 104.8572949], 10);
+    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+    }).addTo(map);
+
+    function resizeMap() {
+        var mapElement = document.getElementById('map');
+        mapElement.style.height = window.innerHeight + 'px';
+        mapElement.style.width = window.innerWidth + 'px';
+        map.invalidateSize();
+    }
+
+    window.addEventListener('resize', resizeMap);
+    resizeMap();
+
+    fetch('/get_all_routes_and_places/')
+        .then(response => response.json())
+        .then(data => {
+            if (data.routes) {
+                data.routes.forEach(route => {
+                    L.polyline([route.from, route.to], { color: 'blue' }).addTo(map);
+                });
+            } else {
+                console.error('Error fetching routes:', data.error);
+            }
+
+            if (data.places) {
+                data.places.forEach(place => {
+                    L.marker([place.latitude, place.longitude]).addTo(map)
+                        .bindPopup(`<b>${place.name}</b>`)
+                        .openPopup();
+                });
+            } else {
+                console.error('Error fetching places:', data.error);
+            }
+
+            if (data.user_location) {
+                L.marker([data.user_location[0], data.user_location[1]], {
+                    icon: L.icon({
+                        iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png',
+                        shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+                        iconSize: [25, 41],
+                        iconAnchor: [12, 41],
+                        popupAnchor: [1, -34],
+                        shadowSize: [41, 41]
+                    })
+                }).addTo(map)
+                .bindPopup(`<b>Start Point</b>`)
+                .openPopup();
+            } else {
+                console.error('Error fetching user location:', data.error);
+            }
+
+            if (data.num_possible_routes) {
+                document.getElementById('routes-info').innerText = `เส้นทางที่เป็นไปได้ทั้งหมด: ${data.num_possible_routes}`;
+            }
+        })
+        .catch(error => {
+            console.error('Error fetching data:', error);
+        });
+</script>
+{% endblock %}

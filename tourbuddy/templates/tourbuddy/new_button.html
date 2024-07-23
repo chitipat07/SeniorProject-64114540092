@@ -1,0 +1,60 @@
+{% if user.is_authenticated %}
+
+
+<!-- <div class="fixed hidden sm:block bottom-0 right-0 p-4">
+  <a href="">
+    <button
+      class="bg-blue-500 w-52 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded inline-flex items-center animate-bounce">
+      <span class="relative flex h-3 w-3 mr-2">
+        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+        <span class="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span>
+      </span>
+      <span>เริ่มการวางแผนกันเลยย</span>
+    </button>
+  </a>
+</div> -->
+<div class="relative">
+  <div class="bg-gray-200 p-4 rounded-md shadow-md cursor-pointer" onclick="toggleDrawer()" onmouseenter="toggleHover()"
+    onmouseleave="toggleHover()">
+    <div class="fixed hidden sm:block bottom-0 right-0 p-4">
+      <!-- ย้าย Drawer Content ไปข้างบนปุ่ม -->
+      <!-- <div id="drawer" class="hidden absolute right-0 w-48 bg-white rounded-md mt-[-3.5rem]">
+        <button
+          class="bg-blue-500 w-52 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded inline-flex items-center animate-bounce">
+          
+          <span>เริ่มการวางแผนกันเลยย</span>
+        </button>
+      </div> -->
+      <a href="{% url 'home_get_plan' %}">
+        <button
+          class="bg-green-500 w-auto hover:bg-green-700 text-white text-3xl font-bold py-2 px-4 rounded-full inline-flex items-center animate-bounce">
+          <span class="relative flex h-3 w-3 mr-2">
+            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+            <span class="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span>
+          </span>
+          <div> get plan </div>
+          <i class="fa-solid fa-right-to-bracket"></i>
+        </button>
+      </a>
+
+    </div>
+  </div>
+
+</div>
+
+<script>
+  // สร้างฟังก์ชันเพื่อเปิด/ปิดลิ้นชัก
+  function toggleDrawer() {
+    var drawer = document.getElementById('drawer');
+    drawer.classList.toggle('hidden');
+  }
+
+  // ฟังก์ชันสำหรับเพิ่ม/ลบชั้นของการชี้เมาส์เพื่อเปิด/ปิดลิ้นชักเมื่อชี้เมาส์
+  function toggleHover() {
+    var drawer = document.getElementById('drawer');
+    drawer.classList.toggle('hidden');
+  }
+</script>
+
+
+{% endif %}

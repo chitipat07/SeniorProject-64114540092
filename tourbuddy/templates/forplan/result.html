@@ -1,0 +1,155 @@
+{% extends 'tourbuddy/index.html' %}
+
+{% block content %}
+
+<div
+    class="md:max-w-max mx-auto bg-white rounded-lg overflow-hidden shadow-lg mb-10 mt-10 mr-10 ml-10 sm:max-w-md sm:mr-10 sm:ml-10">
+    <div class="bg-gray-200 px-4 py-2">
+        <h5 class="text-lg font-semibold text-gray-800">Map</h5>
+    </div>
+    <div class="px-4 py-2">
+        <div id="map" class="h-96 sm:h-80 lg:h-screen"></div>
+    </div>
+</div>
+
+
+{{ places|json_script:"places_json" }}
+{{ user_locations|json_script:"user_locations_json" }}
+
+<script>
+    var map = L.map('map').setView([15.2302166, 104.8572949], 10);
+    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+    }).addTo(map);
+
+    function resizeMap() {
+        var mapElement = document.getElementById('map');
+        mapElement.style.height = window.innerHeight + 'px';
+        mapElement.style.width = window.innerWidth + 'px';
+        map.invalidateSize();
+    }
+
+    window.addEventListener('resize', resizeMap);
+    resizeMap();
+
+    let places = JSON.parse(document.getElementById('places_json').textContent);
+    let userLocations = JSON.parse(document.getElementById('user_locations_json').textContent);
+
+
+    var greenIcon = new L.Icon({
+        iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png',
+        shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+        iconSize: [25, 41],
+        iconAnchor: [12, 41],
+        popupAnchor: [1, -34],
+        shadowSize: [41, 41]
+    });
+
+
+
+    var tspRoutePromise = fetch('/show_tsp_graph/')
+        .then(response => response.json())
+        .then(data => {
+            var tspRoute = data.tsp_route;
+            tspRoute = tspRoute.map(coord => [coord[0], coord[1]]);
+            var waypoints = tspRoute.map(coord => L.latLng(coord[0], coord[1]));
+            return { waypoints: waypoints, userLocation: data.user_location };
+        })
+        .catch(error => {
+            console.error('Error fetching TSP route:', error);
+            return { waypoints: [], userLocation: null };
+        });
+
+    tspRoutePromise.then(routeData => {
+        var waypoints = routeData.waypoints;
+        var userLocation = routeData.userLocation;
+
+        var control = L.Routing.control({
+            waypoints: waypoints,
+            routeWhileDragging: true,
+            show: false,
+            createMarker: function (i, waypoint, n) {
+                if (i === 0 && userLocation) {
+                    // กำหนด zIndex ให้มากกว่าค่าเริ่มต้น (สำหรับ marker อื่นๆ)
+                    return L.marker(waypoint.latLng, {
+                        icon: L.icon({
+                            iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png',
+                            shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+                            iconSize: [25, 41],
+                            iconAnchor: [12, 41],
+                            popupAnchor: [1, -34],
+                            shadowSize: [41, 41],
+                            zIndexOffset: 1000  // กำหนด zIndex ให้มากกว่าค่าเริ่มต้น
+                        })
+                    });
+                } else {
+                    return L.marker(waypoint.latLng);
+                }
+            }
+        }).addTo(map);
+
+        control.on('routesfound', function (e) {
+            var routes = e.routes;
+            var route = routes[0];
+            var coordinates = route.coordinates;
+
+            var marker = L.marker([coordinates[0].lat, coordinates[0].lng], {
+                icon: L.icon({
+                    iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png',
+                    shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+                    iconSize: [25, 41],
+                    iconAnchor: [12, 41],
+                    popupAnchor: [1, -34],
+                    shadowSize: [41, 41]
+                })
+            }).addTo(map);
+
+            coordinates.forEach(function (coord, index) {
+                setTimeout(function () {
+                    marker.setLatLng([coord.lat, coord.lng]);
+                }, 100 * index);
+            });
+        });
+        
+        places.forEach(place => {
+            L.marker([place.trip__latitude, place.trip__longitude]).addTo(map)
+                .bindPopup(`<b>${place.trip__name}</b><br><img src="${place.trip__image}" width="100">`)
+                .openPopup();
+        });
+
+        // เพิ่ม marker ของจุดเริ่มต้น
+        if (userLocation) {
+            L.marker([userLocation[0], userLocation[1]], {
+                icon: L.icon({
+                    iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png',
+                    shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+                    iconSize: [25, 41],
+                    iconAnchor: [12, 41],
+                    popupAnchor: [1, -34],
+                    shadowSize: [41, 41],
+                    zIndexOffset: 1000  // กำหนด zIndex ให้มากกว่าค่าเริ่มต้น
+                })
+            }).addTo(map)
+                .bindPopup(`<b>Start Point</b>`)
+                .openPopup();
+        } else {
+            console.error('Error fetching user location:', data.error);
+        }
+    });
+
+
+
+</script>
+
+{% include 'forplan/social_button.html' %}
+
+<div class="flex justify-center mb-10 text-xl">
+    <a href="{% url 'update_current_location' %}">
+        <button class="bg-yellow-300 hover:bg-yellow-500 text-black font-semibold py-2 px-4 rounded">
+            <i class="fa-solid fa-pen-to-square mr-2"></i>แก้ไข จุดเริ่มต้น</button>
+    </a>
+
+</div>
+
+{% endblock %}

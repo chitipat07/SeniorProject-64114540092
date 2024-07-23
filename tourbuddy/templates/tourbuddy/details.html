@@ -1,0 +1,47 @@
+{% extends 'tourbuddy/index.html' %}
+
+{% block content %}
+
+<div class="bg-[#bccfd3] rounded-xl max-w-screen-sm mx-auto p-5 mb-10 mt-10">
+
+    <div class="mb-5 flex justify-between text-sm">
+        <div class="text-indigo-600 flex items-center pb-2 pr-2 border-b-2 border-indigo-600 uppercase">
+            <div class="mr-2 text-xl text-green-900">
+                <i class="fa-solid fa-mountain"></i>
+            </div>
+            <a href="#" class="font-semibold inline-block">{{ data1.0.trip_type }}</a>
+        </div>
+        <a href="{% url 'indexcard1' %}" class="hover:underline hover:text-indigo-600">ย้อนกลับ</a>
+    </div>
+
+    <div class="relative left-1/2 transform -translate-x-1/2">
+        <div id="map" class="w-full h-64"></div>
+        <div class="bg-white rounded-xl shadow-md mt-6 p-6">
+            <div class="relative h-48">
+                <img src="{{ data.image }}" alt="card-image" class="w-full h-full object-cover rounded-xl shadow-lg">
+            </div>
+            <div class="mt-4">
+                <h5 class="text-xl font-semibold text-blue-gray-900">{{ data.name }}</h5>
+                <p class="text-sm text-gray-700">ประเภท: {{ data.g_type }}</p>
+                <p class="text-sm text-gray-700">{{ data.rating }}⭐ คะแนนรีวิว {{ data.review }}</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+{{ place|json_script:"place_json" }}
+
+<script>
+    var placeData = JSON.parse(document.getElementById('place_json').textContent);
+
+    var map = L.map('map').setView([placeData.latitude, placeData.longitude], 13);
+    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+    }).addTo(map);
+
+    L.marker([placeData.latitude, placeData.longitude]).addTo(map);
+
+</script>
+
+{% endblock %}

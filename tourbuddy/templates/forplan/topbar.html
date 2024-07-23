@@ -1,0 +1,191 @@
+<div class="bg-white py-4">
+    <div class="container mx-auto flex justify-between items-center">
+        <a href="{% url 'indexcard1' %}" class="flex items-center">
+
+            <div class="custom-icon text-2xl mr-2">
+                <i class="fas fa-map-location-dot icon"></i>
+            </div>
+            <div class="text-2xl">TourBuddy</div>
+
+        </a>
+
+        <div class="sm:hidden">
+            <button id="menu-toggle"
+                class="block text-gray-500 hover:text-gray-900 focus:text-gray-900 text-3xl mr-3 focus:outline-none">
+                <i class="fa-solid fa-bars"></i>
+            </button>
+        </div>
+
+        {% if user.is_authenticated %}
+        <div class="hidden mr-4 lg:block">
+            <ul class="flex flex-col gap-2 mt-2 mb-4 lg:mb-0 lg:mt-0 lg:flex-row lg:items-center lg:gap-6">
+                <li class="block p-1 text-sm antialiased font-normal leading-normal text-blue-gray-900">
+                    <a href="{% url 'showdatamore' %}?type={{ data1.0.trip_type }}"
+                        class="flex items-center hover:text-indigo-600">
+                        {{ data1.0.trip_type }}
+                    </a>
+                </li>
+                <li class="block p-1 text-sm antialiased font-normal leading-normal text-blue-gray-900">
+                    <a href="{% url 'showdatamore' %}?type={{ data2.0.trip_type }}"
+                        class="flex items-center hover:text-indigo-600">
+                        {{ data2.0.trip_type }}
+                    </a>
+                </li>
+                <li class="block p-1 text-sm antialiased font-normal leading-normal text-blue-gray-900">
+                    <a href="{% url 'showdatamore' %}?type={{ data3.0.trip_type }}"
+                        class="flex items-center hover:text-indigo-600">
+                        {{ data3.0.trip_type }}
+                    </a>
+                </li>
+                <li class="block p-1 text-sm antialiased font-normal leading-normal text-blue-gray-900">
+                    <a href="{% url 'showdatamore' %}?type={{ data4.0.trip_type }}"
+                        class="flex items-center hover:text-indigo-600">
+                        {{ data4.0.trip_type }}
+                    </a>
+                </li>
+                <li class="block p-1 text-sm antialiased font-normal leading-normal text-blue-gray-900">
+                    <a href="{% url 'showdatamore' %}?type={{ data5.0.trip_type }}"
+                        class="flex items-center hover:text-indigo-600">
+                        {{ data5.0.trip_type }}
+                    </a>
+                </li>
+            </ul>
+        </div>
+        <div class="hidden sm:flex items-center space-x-4">
+            <a href="{% url 'read_TouristNode' %}"
+                class="relative text-gray-800 bg-white px-2 rounded text-lg overflow-visible" id="touristNodeLink">
+                <span class="relative flex h-3 w-3" style="left: 20px;">
+                    <span id="animatePing2"
+                        class="animate-ping absolute inline-flex h-full w-full rounded-full bg-sky-800 opacity-75"></span>
+                    <span id="icon2" class="relative inline-flex rounded-full h-3 w-3 bg-sky-500"></span>
+                </span>
+                <i class="fa-solid fa-route" style="font-size: 24px;"></i>
+                <p id="data-list" class="absolute top-0 right-4 px-1 -mt-4 -mr-4 text-sm bg-red-500 rounded-full"></p>
+            </a>
+
+            <div class="text-black">{{ user.first_name }} {{ user.last_name }}</div>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" data-slot="icon"
+                class="w-6 h-6">
+                <path fill-rule="evenodd" fill="black"
+                    d="M18.685 19.097A9.723 9.723 0 0 0 21.75 12c0-5.385-4.365-9.75-9.75-9.75S2.25 6.615 2.25 12a9.723 9.723 0 0 0 3.065 7.097A9.716 9.716 0 0 0 12 21.75a9.716 9.716 0 0 0 6.685-2.653Zm-12.54-1.285A7.486 7.486 0 0 1 12 15a7.486 7.486 0 0 1 5.855 2.812A8.224 8.224 0 0 1 12 20.25a8.224 8.224 0 0 1-5.855-2.438ZM15.75 9a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0Z"
+                    clip-rule="evenodd" />
+            </svg>
+
+
+            <a href="{% url 'logout' %}">
+                <button class="bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-4 rounded">
+                    ออกจากระบบ
+                </button>
+            </a>
+        </div>
+        {% else %}
+        <div class="hidden sm:flex items-center space-x-4">
+            <a href="{% url 'signup' %}">
+                <button
+                    class="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded-full mb-4 w-48 text-center">
+                    <i class="fa-solid fa-user-plus"></i>
+                    สมัครสมาชิก
+                </button>
+            </a>
+            <a href="{% url 'login_view' %}">
+                <button
+                    class="bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-4 rounded-full mb-4 w-48 text-center">
+                    <i class="fa-solid fa-right-to-bracket"></i>
+                    <span style="margin-left: 5px;">เข้าสู่ระบบ</span>
+                </button>
+            </a>
+        </div>
+        {% endif %}
+    </div>
+
+</div>
+
+<div id="menu"
+    class="fixed bg-gray-800 top-0 left-0 w-full h-full flex flex-col justify-center items-center transform translate-x-full transition-transform duration-300 ease-in-out z-50">
+    {% if user.is_authenticated %}
+    <div class="p-4 text-white">
+        <h1 class="text-2xl font-semibold">
+            <i class="fa-solid fa-user-secret"></i>
+            <span style="margin-left: 10px;">{{ user.first_name }} {{ user.last_name }}</span>
+        </h1>
+        <ul class="mt-4">
+            <span class="relative flex h-3 w-3">
+                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-sky-400 opacity-75"></span>
+                <span class="relative inline-flex rounded-full h-3 w-3 bg-sky-500"></span>
+            </span>
+            <li class="mb-2">
+                <a href="#" class="block hover:text-indigo-400">
+                    <i class="fa-solid fa-route" style="font-size: 24px;"></i>
+
+                    <span style="margin-left: 10px;">รายการสถานที่ที่เลือกไว้</span>
+                </a>
+            </li>
+
+            <li class="mb-2">
+                <a href="{% url 'logout' %}" class="block hover:text-indigo-400">
+                    <i class="fa-solid fa-right-from-bracket" style="font-size: 24px;"></i>
+                    <span style="margin-left: 10px;">ออกจากระบบ</span>
+                </a>
+            </li>
+
+        </ul>
+    </div>
+    {% else %}
+    <a href="{% url 'signup' %}">
+        <button
+            class="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded-full mb-4 w-48 text-center">
+            <i class="fa-solid fa-user-plus"></i>
+            สมัครสมาชิก
+        </button>
+    </a>
+    <a href="{% url 'login_view' %}">
+        <button
+            class="bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-4 rounded-full mb-4 w-48 text-center">
+            <i class="fa-solid fa-right-to-bracket"></i>
+            <span style="margin-left: 5px;">เข้าสู่ระบบ</span>
+        </button>
+    </a>
+    {% endif %}
+    <button id="close-menu" class="absolute top-0 right-0 mt-4 mr-4 text-gray-500 hover:text-gray-900">
+        <svg class="h-6 w-6 fill-current" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path fill-rule="evenodd"
+                d="M19.78 4.22a.75.75 0 010 1.06l-14 14a.75.75 0 01-1.06-1.06l14-14a.75.75 0 011.06 0z"
+                clip-rule="evenodd" />
+            <path fill-rule="evenodd" d="M4.22 4.22a.75.75 0 00-1.06 1.06l14 14a.75.75 0 001.06-1.06l-14-14z"
+                clip-rule="evenodd" />
+        </svg>
+    </button>
+</div>
+
+<script>
+    document.getElementById('menu-toggle').addEventListener('click', function () {
+        document.getElementById('menu').classList.add('-translate-x-0');
+    });
+
+    document.getElementById('close-menu').addEventListener('click', function () {
+        document.getElementById('menu').classList.remove('-translate-x-0');
+    });
+    function fetchData() {
+        fetch("{% url 'Notti' %}")
+            .then(response => response.json())
+            .then(data => {
+                var touristNodeExists = data.tourist_node_exists;
+                var animatePingElement = document.getElementById("animatePing2");
+                var iconElement = document.getElementById("icon2");
+
+                if (touristNodeExists) {
+                    animatePingElement.style.display = "block";
+                    iconElement.style.display = "inline-flex";
+                } else {
+                    animatePingElement.style.display = "none";
+                    iconElement.style.display = "none";
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching tourist node status:', error);
+            });
+    }
+
+    setInterval(fetchData, 5000); // อัพเดทข้อมูลทุก 5 วินาที
+    fetchData();
+</script>

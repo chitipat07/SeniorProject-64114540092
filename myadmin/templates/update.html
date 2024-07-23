@@ -1,0 +1,75 @@
+{% extends 'admin_page.html' %}
+
+{% block content %}
+<div class="bg-grey-lighter min-h-screen flex flex-col">
+    <div class="container max-w-sm mx-auto flex-1 flex flex-col items-center justify-center px-2">
+        <div class="bg-white px-6 py-8 rounded-3xl shadow-2xl text-black w-full">
+            <h1 class="mb-8 text-3xl text-center">Update Trip</h1>
+            <form action="" method="post">
+                {% csrf_token %}
+                <div class="block border border-grey-light w-full p-3 rounded-3xl mb-4">
+                    {{ form.location.label_tag }}
+                    {{ form.location }}
+                    {{ form.location.errors }}
+                </div>
+                <div class="block border border-grey-light w-full p-3 rounded-3xl mb-4">
+                    {{ form.latitude.label_tag }}
+                    {{ form.latitude }}
+                    {{ form.latitude.errors }}
+                </div>
+                <div class="block border border-grey-light w-full p-3 rounded-3xl mb-4">
+                    {{ form.longitude.label_tag }}
+                    {{ form.longitude }}
+                    {{ form.longitude.errors }}
+                </div>
+                <div class="block border border-grey-light w-full p-3 rounded-3xl mb-4">
+                    {{ form.name.label_tag }}
+                    {{ form.name }}
+                    {{ form.name.errors }}
+                </div>
+                <div class="block border border-grey-light w-full p-3 rounded-3xl mb-4">
+                    {{ form.rating.label_tag }}
+                    {{ form.rating }}
+                    {{ form.rating.errors }}
+                </div>
+                <div class="block border border-grey-light w-full p-3 rounded-3xl mb-4">
+                    {{ form.review.label_tag }}
+                    {{ form.review }}
+                    {{ form.review.errors }}
+                </div>
+                <div class="block border border-grey-light w-full p-3 rounded-3xl mb-4">
+                    {{ form.trip_type.label_tag }}
+                    {{ form.trip_type }}
+                    {{ form.trip_type.errors }}
+                </div>
+                <div class="block border border-grey-light w-full p-3 rounded-3xl mb-4">
+                    {{ form.g_type.label_tag }}
+                    {{ form.g_type }}
+                    {{ form.g_type.errors }}
+                </div>
+                <div class="block border border-grey-light w-full p-3 rounded-3xl mb-4">
+                    {{ form.image.label_tag }}
+                    {{ form.image }}
+                    {{ form.image.errors }}
+                </div>
+
+                {% if form.non_field_errors %}
+                <div class="p-6 py-6 bg-red-200 text-red-800 rounded-xl">
+                    {% for error in form.non_field_errors %}
+                        <p>{{ error|escape }}</p>
+                    {% endfor %}
+                </div>
+                {% endif %}
+
+                <button type="submit"
+                    class="w-full text-center py-3 rounded-3xl bg-green text-white bg-green-600 focus:outline-none my-1">
+                    Update Trip
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+
+{% endblock %}

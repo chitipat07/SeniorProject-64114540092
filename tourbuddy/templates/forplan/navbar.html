@@ -1,0 +1,125 @@
+<style>
+  #navbar {
+    transition: transform 0.3s ease-in-out;
+    transform: translateY(-100%);
+  }
+
+  #navbar.active {
+    transform: translateY(0);
+  }
+</style>
+
+<nav id="navbar" class="fixed top-0 w-full z-10 bg-gray-800 text-white">
+  <div class="bg-gray-800 py-4">
+    <div class="container mx-auto flex justify-between items-center">
+      <a href="{% url 'indexcard1' %}" class="flex items-center">
+        <div class="custom-icon text-2xl mr-2">
+          <i class="fas fa-map-location-dot icon"></i>
+        </div>
+        <div class="text-2xl">TourBuddy</div>
+      </a>
+
+      <div class="justify-center items-center hidden md:flex">
+        <form action="{% url 'search_data2' %}" method="get" class="flex items-center justify-center">
+          {% csrf_token %}
+          <div class="relative">
+            <input type="text" name="query" placeholder="ค้นหา"
+              class="w-full sm:w-96 py-2 px-4 pl-10 border shadow-lg rounded-full dark:text-gray-800 dark:border-gray-700 dark:bg-gray-200">
+            <div class="absolute top-0 left-3 flex items-center h-full">
+              <svg class="w-5 h-5 text-gray-400" fill="none" stroke-linecap="round" stroke-linejoin="round"
+                stroke-width="2" viewBox="0 0 24 24" stroke="currentColor">
+                <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+              </svg>
+            </div>
+          </div>
+        </form>
+
+
+
+        <form action="{% url 'data_filter2' %}" method="get" class="flex ml-2 items-center">
+          {% csrf_token %}
+          <select id="trip_type" name="trip_type"
+            class="dark:bg-gray-200 border rounded-full border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-600 text-sm focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
+            <option selected>เลือกประเภทการท่องเที่ยว</option>
+            <option value="" class="bg-white dark:bg-gray-800">ทั้งหมด</option>
+            {% for t in types %}
+            <option value="{{ t.trip_type }}" class="bg-white dark:bg-gray-800">{{ t.trip_type }}</option>
+            {% endfor %}
+          </select>
+          <button type="submit"
+            class="bg-gray-400 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded-full border shadow-lg ml-2">
+            กรอง
+          </button>
+        </form>
+      </div>
+
+      {% if user.is_authenticated %}
+      <div class="block md:flex items-center space-x-4 mr-10"> <!-- แสดงทุกขนาดหน้าจอ -->
+        <a href="{% url 'read_TouristNode' %}"
+          class="relative text-white bg-gray-800 px-2 rounded text-lg overflow-visible" id="touristNodeLink">
+          <span class="relative flex h-3 w-3" style="left: 20px;">
+            <span id="animatePing3"
+              class="animate-ping absolute inline-flex h-full w-full rounded-full bg-sky-800 opacity-75"></span>
+            <span id="icon3" class="relative inline-flex rounded-full h-3 w-3 bg-sky-500"></span>
+          </span>
+          <i class="fa-solid fa-route" style="font-size: 24px;"></i>
+          <p id="data-list1" class="absolute top-0 right-4 px-1 -mt-4 -mr-4 text-sm bg-red-500 rounded-full"></p>
+        </a>
+      </div>
+
+      {% else %}
+      <div class="hidden sm:flex items-center space-x-4">
+        <a href="{% url 'signup' %}">
+          <button
+            class="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded-full mb-4 w-48 text-center">
+            <i class="fa-solid fa-user-plus"></i>
+            สมัครสมาชิก
+          </button>
+        </a>
+        <a href="{% url 'login_view' %}">
+          <button
+            class="bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-4 rounded-full mb-4 w-48 text-center">
+            <i class="fa-solid fa-right-to-bracket"></i>
+            <span style="margin-left: 5px;">เข้าสู่ระบบ</span>
+          </button>
+        </a>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</nav>
+
+<script>
+  const navbar = document.getElementById('navbar');
+
+  window.addEventListener('scroll', () => {
+    if (window.scrollY > 600) {
+      navbar.classList.add('active');
+    } else {
+      navbar.classList.remove('active');
+    }
+  });
+  function fetchData() {
+        fetch("{% url 'Notti' %}")
+            .then(response => response.json())
+            .then(data => {
+                var touristNodeExists = data.tourist_node_exists;
+                var animatePingElement = document.getElementById("animatePing3");
+                var iconElement = document.getElementById("icon3");
+
+                if (touristNodeExists) {
+                    animatePingElement.style.display = "block";
+                    iconElement.style.display = "inline-flex";
+                } else {
+                    animatePingElement.style.display = "none";
+                    iconElement.style.display = "none";
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching tourist node status:', error);
+            });
+    }
+
+    setInterval(fetchData, 5000); // อัพเดทข้อมูลทุก 5 วินาที
+    fetchData();
+</script>

@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"> -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Itim&display=swap" rel="stylesheet">
+
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+        integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+
+    <!-- Leaflet JavaScript -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+
+    <!-- Leaflet Heat Plugin (if needed) -->
+    <script src="https://cdn.rawgit.com/Leaflet/Leaflet.heat/gh-pages/dist/leaflet-heat.js"></script>
+
+    <!-- Leaflet Routing Machine -->
+    <script src="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.js"></script>
+
+    <title>TourBuddy</title>
+</head>
+
+{% include 'tourbuddy/style.html' %}
+
+<body class="font-myFont">
+    {% include 'forplan/navbar.html' %}
+    {% include 'forplan/topbar.html' %}
+
+
+
+
+    <div class="relative">
+        <img class="rounded-lg h-96 w-full border object-cover transition-all duration-300 blur-sm hover:blur-none"
+            src="https://besthqwallpapers.com/Uploads/22-6-2022/200832/thumb2-4k-aerial-view-paradise-surf-waves.jpg" alt="" />
+    </div>
+
+    <div
+        class="overflow-hidden absolute top-96 left-1/2 transform -translate-x-1/2 shadow-2xl text-center sm:top-48 sm:w-full">
+        <div class="text-3xl md:text-4xl sm:text-5xl text-black">ท่องเที่ยวจังหวัดอุบลราชธานี</div>
+    </div>
+
+    <div
+        class="overflow-hidden absolute top-96 sm:top-80 left-1/2 transform -translate-x-1/2 shadow-2xl bg-white rounded-3xl">
+        <div class="p-6">
+            <h5 class="mb-2 text-xl font-medium leading-tight">
+                สวัสดี
+            </h5>
+
+            <div class="flex justify-center items-center">
+                <form action="{% url 'search_data2' %}" method="get" class="flex items-center justify-center">
+                    {%csrf_token%}
+                    <div class="relative">
+                        <input type="text" name="query" placeholder="ค้นหา"
+                            class="w-full sm:w-96 py-2 px-4 pl-10 border shadow-lg rounded-full dark:text-gray-800 dark:border-gray-700 dark:bg-gray-200">
+                        <div class="absolute top-0 left-3 flex items-center h-full">
+                            <svg class="w-5 h-5 text-gray-400" fill="none" stroke-linecap="round"
+                                stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" stroke="currentColor">
+                                <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                            </svg>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <form action="{% url 'data_filter2' %}" method="get">
+                {% csrf_token %}
+                <label for="trip_type" class="block mb-2 text-sm font-medium text-gray-700 dark:text-white">Select an
+                    option</label>
+                <select id="trip_type" name="trip_type"
+                    class="dark:bg-gray-200 border rounded-full border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-600 text-sm focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
+                    <option selected>เลือกประเภทการท่องเที่ยว</option>
+                    <option value="" class="bg-white dark:bg-gray-800">ทั้งหมด</option>
+                    {% for t in types %}
+                    <option value="{{ t.trip_type }}" class="bg-white dark:bg-gray-800">{{ t.trip_type }}</option>
+                    {% endfor %}
+                </select>
+                <p class="text-base text-surface/75 dark:text-neutral-300">
+                    <small>Last updated 3 mins ago</small>
+                </p>
+
+                <div class="flex justify-center">
+                    <button type="submit"
+                        class="bg-gray-400 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded-full w-40 border shadow-lg">
+                        กรอง
+                    </button>
+                </div>
+            </form>
+
+        </div>
+    </div>
+    {% if query %}
+    {% include 'forplan/search_forplan.html' %}
+    {% endif %}
+
+    {% block content %}
+    <div class="rounded-3xl max-w-screen-xl mt-32 mx-auto p-5 sm:p-10 md:p-16 bg-[#e5e6d6] mb-20">
+
+        <div class="border-b mb-5 flex justify-between text-sm">
+            <div class="text-indigo-600 flex items-center pb-2 pr-2 border-b-2 border-indigo-600 uppercase">
+                <div class="mr-2 text-xl text-green-900">
+                    <i class="fa-solid fa-mountain"></i>
+                </div>
+                <a href="#" class="font-semibold inline-block">กรุณากดหัวใจ เพื่อเลือกเป็นสถานที่จะไป</a>
+            </div>
+            <a href="{% url 'indexcard1' %}" class="hover:underline hover:text-indigo-600">ย้อนกลับ</a>
+
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-10">
+            {% for i in data_page %}
+            <div
+                class="rounded-lg bg-white overflow-hidden shadow-lg flex flex-col transform transition duration-300 ease-in-out hover:scale-110">
+                <a href="#"></a>
+                <div class="relative">
+                    <a href="{% url 'details' i.id %}">
+                        <img class="w-full" style="height: 250px; object-fit: cover;" src="{{i.image}}"
+                            alt="Sunset in the mountains">
+                        <div
+                            class="absolute bottom-0 top-0 right-0 left-0 bg-gray-900 opacity-25 hover:bg-transparent transition duration-300">
+                        </div>
+                    </a>
+                    <a href="#!">
+                        <div
+                            class="text-xs absolute top-0 right-0 bg-yellow-400 rounded-full px-4 py-2 text-black mt-3 mr-3 hover:bg-white hover:text-indigo-600 transition duration-500 ease-in-out">
+                            {{i.rating}}
+                        </div>
+                    </a>
+                </div>
+                <div class="px-6 py-4 mb-auto">
+                    <a href="#"
+                        class="font-medium text-lg inline-block hover:text-indigo-600 transition duration-500 ease-in-out mb-2">
+                        {{i.name }}</a>
+                    <p class="text-gray-500 text-sm">
+                        {{i.g_type}}
+                    </p>
+                </div>
+                <div class="px-6 py-3 flex flex-row items-center justify-between bg-gray-100">
+                    {% include 'forplan/heart.html' %}
+
+                </div>
+            </div>
+            {%endfor%}
+        </div>
+        <div class="flex justify-center mt-20 mb-32">
+            <div id="pagination" data-pages="{{ data_page.paginator.num_pages }}" data-current="{{ data_page.number }}">
+
+            </div>
+        </div>
+
+
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const paginationElement = document.getElementById('pagination');
+            const totalPages = parseInt(paginationElement.getAttribute('data-pages'));
+            const currentPage = parseInt(paginationElement.getAttribute('data-current'));
+            const paginationContainer = document.querySelector('.flex.justify-center.mt-20');
+
+            for (let page = 1; page <= totalPages; page++) {
+                if (page == currentPage || page == currentPage - 1 || page == currentPage + 1 || page == 1 || page == totalPages) {
+                    const link = document.createElement('a');
+                    link.href = `?page=${page}`;
+                    link.textContent = page;
+                    link.classList.add('py-2', 'px-4', 'mx-1', 'rounded');
+                    if (page == currentPage) {
+                        link.classList.add('bg-blue-500', 'text-white');
+                    } else {
+                        link.classList.add('hover:bg-blue-400');
+                    }
+                    paginationContainer.appendChild(link);
+                }
+            }
+        });
+    </script>
+
+
+    <div class="relative">
+        <div class="bg-gray-200 p-4 rounded-md shadow-md cursor-pointer" onclick="openModal('modelConfirm')"
+            onmouseenter="toggleHover()" onmouseleave="toggleHover()">
+            <div class="fixed hidden sm:block bottom-0 right-0 p-4">
+                <button
+                    class="bg-green-500 hover:bg-green-700 text-white text-3xl font-bold py-2 px-4 rounded-full inline-flex items-center animate-bounce">
+                    <div>ถัดไป</div>
+                    <i class="fa-solid fa-right-to-bracket"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+
+
+    <div id="modelConfirm"
+        class="fixed hidden z-50 inset-0 bg-gray-900 bg-opacity-60 overflow-y-auto h-full w-full px-4 ">
+        <div class="relative top-40 mx-auto shadow-xl rounded-md bg-white max-w-md">
+
+            <div class="flex justify-end p-2">
+                <button onclick="closeModal('modelConfirm')" type="button"
+                    class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center">
+                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                        <path fill-rule="evenodd"
+                            d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                            clip-rule="evenodd"></path>
+                    </svg>
+                </button>
+            </div>
+
+            <div class="p-6 pt-0 text-center">
+                <svg class="w-20 h-20 text-sky-600 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                    xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                <h3 class="text-xl font-normal text-gray-500 mt-5 mb-6">
+                    คุณได้เลือกสถานที่ท่องเที่ยวของตัวเองไว้หรือยัง ? ถ้ายังให้คุณไปกดหัวใจเพื่อเลือกสถานที่
+                    สถานที่ของคุณจะเก็บไว้ที่ <i class="fa-solid fa-route" style="font-size: 24px;"></i>
+                    ถ้าคุณมีสถานที่แล้วให้กด ถัดไป
+                </h3>
+                <a href="{% url 'read_TouristNode' %}" onclick="closeModal('modelConfirm')"
+                    class="text-white bg-green-600 hover:bg-green-800 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-base inline-flex items-center px-3 py-2.5 text-center mr-2">
+                    ถัดไป
+                </a>
+                <a href="#" onclick="closeModal('modelConfirm')"
+                    class="text-gray-900 bg-white hover:bg-gray-100 focus:ring-4 focus:ring-cyan-200 border border-gray-200 font-medium inline-flex items-center rounded-lg text-base px-3 py-2.5 text-center"
+                    data-modal-toggle="delete-user-modal">
+                    ปิด
+                </a>
+            </div>
+
+        </div>
+    </div>
+
+    <script type="text/javascript">
+        window.openModal = function (modalId) {
+            document.getElementById(modalId).style.display = 'block'
+            document.getElementsByTagName('body')[0].classList.add('overflow-y-hidden')
+        }
+
+        window.closeModal = function (modalId) {
+            document.getElementById(modalId).style.display = 'none'
+            document.getElementsByTagName('body')[0].classList.remove('overflow-y-hidden')
+        }
+
+        // Close all modals when press ESC
+        document.onkeydown = function (event) {
+            event = event || window.event;
+            if (event.keyCode === 27) {
+                document.getElementsByTagName('body')[0].classList.remove('overflow-y-hidden')
+                let modals = document.getElementsByClassName('modal');
+                Array.prototype.slice.call(modals).forEach(i => {
+                    i.style.display = 'none'
+                })
+            }
+        };
+    </script>
+
+
+
+
+    {% endblock %}
+</body>
+
+</html>

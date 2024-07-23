@@ -1,0 +1,15 @@
+{% extends 'admin_page.html' %}
+
+{% block content %}
+<div class="flex items-center justify-center mt-5">
+    <div class="bg-white p-8 rounded shadow-md">
+        <h1 class="text-2xl font-bold mb-4">Delete User</h1>
+        <p class="mb-4">คุณต้องการลบ user "{{ user.username }}"?</p>
+        <form method="post">
+            {% csrf_token %}
+            <button type="submit" class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700">Confirm</button>
+            <a href="{% url 'list_users' %}" class="bg-gray-600 text-white px-4 py-2 rounded ml-4 hover:bg-gray-700">Cancel</a>
+        </form>
+    </div>
+</div>
+{% endblock %}

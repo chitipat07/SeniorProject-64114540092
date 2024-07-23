@@ -1,0 +1,70 @@
+{% extends 'tourbuddy/index.html' %}
+
+{% block content %}
+<div class="max-w-md mx-auto bg-white rounded-lg overflow-hidden shadow-lg mb-10 mt-10">
+    <div class="bg-gray-200 px-4 py-2">
+        <h5 class="text-lg font-semibold text-gray-800">คลิก location ที่คุณต้องการ</h5>
+    </div>
+    <div class="px-4 py-2">
+        <div id="map" style="height: 400px;"></div>
+    </div>
+    <div class="px-4 py-2">
+        <form action="{% url 'update_user_location' %}" method="post" class="mt-4">
+            {% csrf_token %}
+            <input type="hidden" name="user_id" value="{{ user.id }}">
+            <input type="text" name="user_latitude" id="id_latitude" readonly hidden>
+            <input type="text" name="user_longitude" id="id_longitude" readonly hidden>
+            <button type="submit" id="save-location" class="bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-4 rounded">บันทึก</button>
+        </form>
+    </div>
+</div>
+
+<script>
+    var map = L.map('map').setView([15.2302166, 104.8572949], 10);
+    var marker;
+
+    // Use the OpenStreetMap tile layer
+    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    }).addTo(map);
+
+    map.on('click', function (e) {
+        var latitude = e.latlng.lat;
+        var longitude = e.latlng.lng;
+
+        // Update hidden fields with the selected location's coordinates
+        document.getElementById('id_latitude').value = latitude;
+        document.getElementById('id_longitude').value = longitude;
+
+        // Remove previous marker if exists
+        if (marker) {
+            map.removeLayer(marker);
+        }
+
+        // Add a marker with a popup
+        marker = L.marker([latitude, longitude]).addTo(map);
+        marker.bindPopup(`<b>Selected Location</b><br>Latitude: ${latitude}<br>Longitude: ${longitude}`).openPopup();
+    });
+
+    document.getElementById('save-location').addEventListener('click', function () {
+        var latitude = document.getElementById('id_latitude').value;
+        var longitude = document.getElementById('id_longitude').value;
+
+        // Send data via AJAX
+        var xhr = new XMLHttpRequest();
+        xhr.open('POST', '/update_user_location/', true);
+        xhr.setRequestHeader('Content-Type', 'application/json');
+        xhr.send(JSON.stringify({
+            user_id: '{{ user.id }}',
+            user_latitude: latitude,
+            user_longitude: longitude
+        }));
+
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState === 4 && xhr.status === 200) {
+                console.log('User location updated successfully');
+            }
+        };
+    });
+</script>
+{% endblock %}
